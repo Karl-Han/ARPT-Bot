@@ -8,14 +8,14 @@ import requests
 import json
 
 
-Aria2_host="http://127.0.0.1"
+Aria2_host="http://aria2"
 Aria2_port="8080"
 Aria2_secret=os.environ.get('Aria2_secret')
 
 def change_password():
 
 
-    login_url = "http://127.0.0.1:9184/api/login"
+    login_url = "http://filebrowser:9184/api/login"
 
     login_data = {"username": "admin", "password": "admin", "recaptcha": ""}
 
@@ -24,7 +24,7 @@ def change_password():
         print(f"登录失败：{html.text}")
         return
 
-    change_url = "http://127.0.0.1:9184/api/users/1"
+    change_url = "http://filebrowser:9184/api/users/1"
 
     print(html.text)
     headers = {}
