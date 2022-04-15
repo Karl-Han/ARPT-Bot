@@ -10,4 +10,7 @@ RUN sudo apt-get install -y wget git curl unzip
 
 RUN curl https://rclone.org/install.sh | sudo bash
 
+RUN mkdir -p /root/.config/rclone
+COPY rclone/rclone.conf /root/.config/rclone
+
 CMD rclone rcd --rc-addr=0.0.0.0:5572 --rc-user=root --rc-pass=$Aria2_secret --rc-allow-origin="https://elonh.github.io"
