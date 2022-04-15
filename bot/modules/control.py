@@ -596,7 +596,7 @@ async def run_await_rclone(dir,title,info,file_num,client, message,gid):
     Rclone_remote=os.environ.get('Remote')
     Upload=os.environ.get('Upload')
 
-    rc_url = f"http://root:{Aria2_secret}@127.0.0.1:5572"
+    rc_url = f"http://root:{Aria2_secret}@rclone:5572"
     info = await client.send_message(chat_id=message.chat.id, text="开始上传", parse_mode='markdown')
     name=f"{str(info.message_id)}_{str(info.chat.id)}"
 
@@ -991,7 +991,7 @@ def run_rclone(dir,title,info,file_num,client, message,gid):
     task.append(gid)
     print(task)
     sys.stdout.flush()
-    rc_url = f"http://root:{Aria2_secret}@127.0.0.1:5572"
+    rc_url = f"http://root:{Aria2_secret}@rclone:5572"
 
 
     Rclone_remote=os.environ.get('Remote')
