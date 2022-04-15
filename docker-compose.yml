@@ -1,0 +1,16 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  bot:
+    build: ./bot
+    volumes:
+      - /mnt/256_13419:/root/Downloads
+  aria2:
+    build: ./aria2
+    volumes:
+      - /mnt/256_13419:/root/Downloads
+  filebrowser:
+    build: ./filebrowser
+    volumes:
+      - /mnt/256_13419:/root/Downloads
+  nginx:
+    build: ./nginx

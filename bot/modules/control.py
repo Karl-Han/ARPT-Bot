@@ -18,6 +18,8 @@ import requests
 from pyppeteer import launch
 import copy
 import nest_asyncio
+import ffmpeg
+import traceback
 
 nest_asyncio.apply()
 os.system("df -lh")
@@ -538,7 +540,7 @@ async def odprivate_download(client, message):
         await client.send_message(chat_id=message.chat.id, text=f"odprivate error {e}", parse_mode='markdown')
 
 def run_shell(gid,file_num,file_dir):
-    shell = f"bash upload.sh \"{gid}\" \"{file_num}\" '{file_dir}' "
+    shell = f"bash /bot/upload.sh \"{gid}\" \"{file_num}\" '{file_dir}' "
 
     print(shell)
     cmd = subprocess.Popen(shell, stdin=subprocess.PIPE, stderr=sys.stderr, close_fds=True,
@@ -1454,7 +1456,7 @@ def hum_convert(value):
         value = value / size
 
 def get_free_space_mb():
-    result=os.statvfs('/root/')
+    result=os.statvfs('/root/Download')
     block_size=result.f_frsize
     total_blocks=result.f_blocks
     free_blocks=result.f_bfree
@@ -1578,6 +1580,15 @@ async def send_telegram_file(client, message):
         sys.stdout.flush()
 
 
+def get_video_resolution(info):
+    if "streams" in info.keys():
+        streams = info['streams']
+        for i in streams:
+            if 'coded_width' in i.keys() and 'coded_height' in i.keys():
+                return i['coded_width'], i['coded_height']
+            if 'width' in i.keys() and 'height' in i.keys():
+                return i['width'], i['height']
+    return None, None
 
 
 def http_downloadtg(client, message,url):
@@ -1708,14 +1719,38 @@ def http_downloadtg(client, message,url):
         try:
             print("开始上传")
             file_dir=f"{currdownload.dir}/{currdownload.name}"
-            client.send_document(chat_id=info.chat.id, document=file_dir, caption=currdownload.name, progress=progress,
-                                       progress_args=(client, info, currdownload.name,))
+            exts = ["mp4", "mov", "mkv"]
+            video_success = False
+            print("Start to upload {}".format(file_dir))
+            for ext in exts:
+                if ext in currdownload.name:
+                    try:
+                        info_video = ffmpeg.probe(file_dir)
+                        currdownload.width, currdownload.height = get_video_resolution(info_video)
+                        if currdownload.width == None:
+                            print("Failed to get resolution from {}".format(currdownload.name))
+                            print(info_video)
+                            exit(1)
+                            break
+                        print("video size is {}*{}".format(currdownload.width, currdownload.height))
+                        client.send_video(chat_id=info.chat.id, video=file_dir, caption=currdownload.name, progress=progress,
+                                                width=currdownload.width, height=currdownload.height,
+                                                progress_args=(client, info, currdownload.name,))
+                        video_success = True
+                        break
+                    except Exception as e:
+                        print(e)
+                        print(traceback.format_exc())
+
+            if not video_success:
+                client.send_document(chat_id=info.chat.id, document=file_dir, caption=currdownload.name, progress=progress,
+                                        progress_args=(client, info, currdownload.name,))
 
             currdownload.remove(force=True,files=True)
 
         except Exception as e:
             print(e)
-            print("Upload Issue!")
+            print(traceback.format_exc())
             currdownload.remove(force=True, files=True)
     return None
 
