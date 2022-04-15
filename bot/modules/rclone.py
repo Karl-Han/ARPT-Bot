@@ -26,7 +26,7 @@ async def start_rclonecopy(client, message):
         seconddir= message.text.split()[2]
         print(f"rclone {firstdir} {seconddir}")
         sys.stdout.flush()
-        rc_url = f"http://root:{Aria2_secret}@127.0.0.1:5572"
+        rc_url = f"http://root:{Aria2_secret}@rclone:5572"
         info = await client.send_message(chat_id=message.chat.id, text=f"添加任务:", parse_mode='markdown')
 
         rcd_copyfile_url = f"{rc_url}/sync/copy"
@@ -92,7 +92,7 @@ async def start_rclonecopyurl(client, message):
         print(f"rclonecopyurl {url} ")
         sys.stdout.flush()
 
-        rc_url = f"http://root:{Aria2_secret}@127.0.0.1:5572"
+        rc_url = f"http://root:{Aria2_secret}@rclone:5572"
 
         Rclone_remote = os.environ.get('Remote')
         Upload = os.environ.get('Upload')

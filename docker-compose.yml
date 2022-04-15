@@ -3,14 +3,39 @@ services:
   bot:
     build: ./bot
     volumes:
-      - /mnt/256_13419:/root/Downloads
+      - /mnt/256_13419:/root/Download
+    environment:
+      - Api_hash=${Api_hash}
+      - Api_id=${Api_id}
+      - Aria2_secret=${Aria2_secret}
+      - Telegram_bot_api=${Telegram_bot_api}
+      - Telegram_user_id=${Telegram_user_id}
+    depends_on:
+      - aria2
+      - filebrowser
+      - nginx
+      - rclone
   aria2:
     build: ./aria2
     volumes:
-      - /mnt/256_13419:/root/Downloads
+      - /mnt/256_13419:/root/Download
+    ports:
+      - "6800:8080"
+    environment:
+      - Aria2_secret=${Aria2_secret}
   filebrowser:
     build: ./filebrowser
     volumes:
-      - /mnt/256_13419:/root/Downloads
+      - /mnt/256_13419:/root/Download
+    ports:
+      - "9184:9184"
   nginx:
     build: ./nginx
+    ports:
+      - "8080:80"
+  rclone:
+    build: ./rclone
+    ports:
+      - "5572:5572"
+    environment:
+      - Aria2_secret=${Aria2_secret}
